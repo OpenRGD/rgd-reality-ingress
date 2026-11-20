@@ -1,0 +1,69 @@
+name: Public foundation checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  docs-integrity:
+    name: docs-integrity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate documented source boundary and tracked-file hygiene
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import subprocess
+          import sys
+
+          required = (
+              "README.md",
+              "LICENSE",
+              "docs/BOUNDARIES.md",
+              "docs/FEDORA_IMPORT.md",
+          )
+          problems = []
+          for name in required:
+              path = Path(name)
+              if not path.is_file() or not path.read_text(encoding="utf-8").strip():
+                  problems.append(f"required document missing or empty: {name}")
+
+          license_text = Path("LICENSE").read_text(encoding="utf-8")
+          if not license_text.startswith("MIT License"):
+              problems.append("LICENSE must remain MIT for original OpenRGD source")
+
+          tracked = subprocess.check_output(["git", "ls-files", "-z"]).split(b"\0")
+          forbidden_parts = {
+              "captures", "recordings", "datasets", "observations",
+              "secrets", "credentials", "backups", ".venv", "__pycache__"
+          }
+          forbidden_suffixes = {
+              ".wav", ".pcm", ".mp4", ".avi", ".mkv", ".bag",
+              ".db", ".sqlite", ".sqlite3", ".npz", ".npy",
+              ".pem", ".key", ".p12", ".pfx", ".zip"
+          }
+          for raw in tracked:
+              if not raw:
+                  continue
+              path = Path(raw.decode("utf-8"))
+              parts = path.parts
+              if any(part in forbidden_parts for part in parts):
+                  problems.append(f"tracked runtime/private directory: {path}")
+              if path.suffix.lower() in forbidden_suffixes:
+                  problems.append(f"tracked binary/secret-like artifact: {path}")
+              if path.name.startswith(".env") and path.name != ".env.example":
+                  problems.append(f"tracked environment file: {path}")
+
+          if problems:
+              print("\n".join(problems), file=sys.stderr)
+              raise SystemExit(1)
+          print("PASS: documentation and public-source hygiene checks (no hardware access)")
+          PY
