@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openrgd-reality-ingress-experimental"
+version = "0.4.0"
+description = "Experimental, non-actuating generic multi-source observation and temporal probing"
+requires-python = ">=3.10"
+authors = [{name = "OpenRGD prototype"}]
+dependencies = []
+
+[project.optional-dependencies]
+camera = ["opencv-python>=4.8"]
+perception = ["opencv-python>=4.8", "numpy>=1.24", "ultralytics>=8.3"]
+fiducials = ["opencv-python>=4.10", "numpy>=1.24"]
+
+[project.scripts]
+rgd-reality-ingress = "reality_ingress.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

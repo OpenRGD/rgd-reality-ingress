@@ -3,7 +3,7 @@
 **OpenRGD — physical and external observation acquisition, evidence preservation and provenance.**
 
 **Status:** repository bootstrap / contract-design candidate. The Fedora
-`openrgd-reality-ingress-v0.4` implementation has **not yet been imported or audited**.
+`openrgd-reality-ingress-v0.4` implementation has been imported on the **recovery/ri-v0.4-fedora** branch and passed 34 experimental tests. It is NOT accepted as a stable contract or deployed as a physical runtime.
 
 ## Responsibility
 
