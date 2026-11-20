@@ -64,3 +64,15 @@ provenance; the owning temporal and history components decide their canonical
 representations. Design proposals here are not authoritative standards.
 
 **This repository is not an actuating runtime.**
+
+## License and publication
+
+This repository is an **OpenRGD open-source project under the MIT License**.
+See [LICENSE](LICENSE) (copyright © 2026 OpenRGD contributors).
+
+The repository is intended to be **public**. Publishing a repository and
+licensing original code are distinct from validating recovered legacy code:
+Fedora v0.4 source is not in `main` and must pass attribution, dependency,
+secret/PII and provenance review before import or public release. Preserve
+third-party licenses and notices; MIT applies only to code we have the right
+to license. Capture data, credentials and private robot evidence are excluded.
