@@ -1,6 +1,6 @@
 # RI-RECOVERY-01 — Fedora v0.4 recovery audit
 
-**Status:** source imported in recovery PR #2; synthetic test CI passed (34/34). Merge/promotion remains a separate reviewed decision.
+**Status:** source recovered and merged via PR #2 on 23 Nov 2026; synthetic CI passed (34/34). Historical candidate only; physical deployment, canonical acceptance and Perception extraction remain open.
 **Scope:** legacy experimental baseline, not normative Canonical Core.
 
 ## Archived evidence
@@ -41,7 +41,7 @@
 ## Import plan
 
 1. **Completed:** digest verification; allowlisted source/tests and preserved history; GitHub PR #2 with 34/34 passing CI tests.
-2. **Pending:** reviewed merge to `main`; experimental candidate does not become a production or canonical runtime.
+2. **Completed:** reviewed merge to `main` (recovery PR #2). Experimental candidate is **not** a production or canonical runtime.
 3. **Pending:** separate `OpenRGD/rgd-perception` extraction, preserving original immutable evidence IDs and historical API compatibility.
 4. **Pending:** physical commissioning on Paky-01 and licensing review for optional third-party processing dependencies.
 
