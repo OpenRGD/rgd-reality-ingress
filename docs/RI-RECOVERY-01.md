@@ -1,6 +1,6 @@
 # RI-RECOVERY-01 — Fedora v0.4 recovery audit
 
-**Status:** audited original; source import pending explicit push on the development machine.
+**Status:** source imported in recovery PR #2; synthetic test CI passed (34/34). Merge/promotion remains a separate reviewed decision.
 **Scope:** legacy experimental baseline, not normative Canonical Core.
 
 ## Archived evidence
@@ -32,8 +32,7 @@
   `fiducials.py`, `calibration.py` and `derivations.py`.
   **Do not delete or move these yet**: preserve behavior and tests, then
   extract to Perception behind versioned compatibility adapters.
-- The source ZIP contains no LICENSE file. License/attribution must be
-  reviewed before publishing this repository or derived code publicly.
+- The original source ZIP contains no LICENSE file. The repository root MIT license covers only OpenRGD-owned code; third-party dependencies (notably optional Ultralytics) retain their own licensing and require independent compliance review.
 - Filename/regex scans cannot prove absence of all secrets.
 - Do not commit `reality-evidence*`, personal images, downloaded models,
   camera recordings, Python environments, local output or robot secrets.
@@ -41,13 +40,9 @@
 
 ## Import plan
 
-1. Check out this recovery branch on a trusted development machine.
-2. Verify source ZIP digest **before** extraction; extract to staging.
-3. Stage allowlisted `pyproject.toml`, `src/reality_ingress/*.py`,
-   `tests/test_*.py`, and original README/.gitignore under `docs/history/v0.4/`.
-4. Run all tests and inspect staged changes before commit/push.
-5. Open a PR toward `main`; merge is a separate decision.
-6. Use a separate `OpenRGD/rgd-perception` repository for the audited
-   derivation/interpretation extraction. Preserve original immutable evidence IDs.
+1. **Completed:** digest verification; allowlisted source/tests and preserved history; GitHub PR #2 with 34/34 passing CI tests.
+2. **Pending:** reviewed merge to `main`; experimental candidate does not become a production or canonical runtime.
+3. **Pending:** separate `OpenRGD/rgd-perception` extraction, preserving original immutable evidence IDs and historical API compatibility.
+4. **Pending:** physical commissioning on Paky-01 and licensing review for optional third-party processing dependencies.
 
 **No canonical schema promotion or actuator permission is implied.**
