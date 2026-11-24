@@ -1,0 +1,33 @@
+name: RI-INTEGRATION-01 — observation reference candidate
+
+on:
+  pull_request:
+    paths:
+      - "contracts/consumer-observation-ref.v0.1-candidate.schema.json"
+      - "src/reality_ingress/consumer_ref.py"
+      - "tests/test_consumer_ref.py"
+      - ".github/workflows/observation-ref-candidate.yml"
+      - "docs/RI-INTEGRATION-01-PIPELINE.md"
+  push:
+    branches: [main]
+    paths:
+      - "contracts/consumer-observation-ref.v0.1-candidate.schema.json"
+      - "src/reality_ingress/consumer_ref.py"
+      - "tests/test_consumer_ref.py"
+      - ".github/workflows/observation-ref-candidate.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  consumer-contracts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pinned candidate validator and optional legacy fiducial dependencies
+        run: python -m pip install -e ".[fiducials]" "jsonschema==4.23.0"
+      - name: Legacy and candidate synthetic offline tests
+        run: python -m unittest discover -s tests -v
