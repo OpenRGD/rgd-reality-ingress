@@ -1,0 +1,286 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:openrgd:reality-ingress:compatibility-registry:v0.1-candidate",
+  "title": "RI-A01 engineering compatibility snapshot (not a runtime contract)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "registry_version",
+    "snapshot_date",
+    "normative",
+    "runtime_authority",
+    "physical_commissioning",
+    "baseline",
+    "targets"
+  ],
+  "properties": {
+    "registry_version": {
+      "const": "ri.compatibility-registry.v0.1-candidate"
+    },
+    "snapshot_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "normative": {
+      "const": false
+    },
+    "runtime_authority": {
+      "const": false
+    },
+    "physical_commissioning": {
+      "const": false
+    },
+    "baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "pull_request",
+        "commit",
+        "contract_id",
+        "schema_path",
+        "schema_git_blob_sha1",
+        "frozen_files"
+      ],
+      "properties": {
+        "repository": {
+          "const": "OpenRGD/rgd-reality-ingress"
+        },
+        "pull_request": {
+          "const": 4
+        },
+        "commit": {
+          "const": "5372f758df79c93fc887f3858d878635447f4a4d"
+        },
+        "contract_id": {
+          "const": "ri.consumer-observation-ref.v0.1-candidate"
+        },
+        "schema_path": {
+          "const": "contracts/consumer-observation-ref.v0.1-candidate.schema.json"
+        },
+        "schema_git_blob_sha1": {
+          "const": "3d92e074e71593bf6db0a735394c628ea131668d"
+        },
+        "frozen_files": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "git_blob_sha1"
+            ],
+            "properties": {
+              "path": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 256
+              },
+              "git_blob_sha1": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{40}$"
+              }
+            }
+          },
+          "minItems": 1,
+          "maxItems": 100
+        }
+      }
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "status",
+          "integrations",
+          "open_gates"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^RI-H(?:0[1-9]|10)$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "status": {
+            "enum": [
+              "awaiting_return",
+              "blocked_repo_pending",
+              "candidate_compatible",
+              "review_only"
+            ]
+          },
+          "integrations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "id",
+                "repository",
+                "pull_request",
+                "commit",
+                "return_comment_id",
+                "pr_state_at_review",
+                "verification_kind",
+                "scope",
+                "limits",
+                "artifacts",
+                "checks"
+              ],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "pattern": "^[A-Z0-9][A-Z0-9-]{1,63}$"
+                },
+                "repository": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$",
+                  "maxLength": 160
+                },
+                "pull_request": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "commit": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{40}$"
+                },
+                "return_comment_id": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991
+                },
+                "pr_state_at_review": {
+                  "enum": [
+                    "open_draft",
+                    "open_review",
+                    "merged",
+                    "closed"
+                  ]
+                },
+                "verification_kind": {
+                  "enum": [
+                    "pinned_ri_implementation",
+                    "pinned_contract_fixture",
+                    "pinned_contract_boundary",
+                    "metadata_only",
+                    "documentary_review"
+                  ]
+                },
+                "scope": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 800
+                },
+                "limits": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 800
+                  },
+                  "minItems": 1,
+                  "maxItems": 12
+                },
+                "artifacts": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "path",
+                      "git_blob_sha1"
+                    ],
+                    "properties": {
+                      "path": {
+                        "type": "string",
+                        "minLength": 1,
+                        "maxLength": 256
+                      },
+                      "git_blob_sha1": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{40}$"
+                      }
+                    }
+                  },
+                  "minItems": 1,
+                  "maxItems": 30
+                },
+                "checks": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": [
+                      "run_id",
+                      "tested_commit",
+                      "conclusion",
+                      "scope"
+                    ],
+                    "properties": {
+                      "run_id": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 9007199254740991
+                      },
+                      "tested_commit": {
+                        "type": "string",
+                        "pattern": "^[0-9a-f]{40}$"
+                      },
+                      "conclusion": {
+                        "enum": [
+                          "success",
+                          "failure",
+                          "cancelled",
+                          "skipped",
+                          "timed_out",
+                          "neutral",
+                          "action_required",
+                          "stale"
+                        ]
+                      },
+                      "scope": {
+                        "enum": [
+                          "ri_conformance",
+                          "metadata_conformance",
+                          "contract_fixture_conformance",
+                          "schema_boundary_conformance",
+                          "owner_checks"
+                        ]
+                      }
+                    }
+                  },
+                  "minItems": 0,
+                  "maxItems": 20
+                }
+              }
+            },
+            "minItems": 0,
+            "maxItems": 20
+          },
+          "open_gates": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^RI-A(?:0[1-9]|1[0-2])$"
+            },
+            "minItems": 1,
+            "maxItems": 12,
+            "uniqueItems": true
+          }
+        }
+      },
+      "minItems": 10,
+      "maxItems": 10
+    }
+  }
+}
