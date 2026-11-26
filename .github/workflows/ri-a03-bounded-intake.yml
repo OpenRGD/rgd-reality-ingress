@@ -1,0 +1,62 @@
+name: RI-A03 bounded intake
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  intake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install -e . "jsonschema==4.23.0"
+      - name: Original frozen registry and native profile regression
+        run: |
+          python scripts/check_compat_registry.py --git-baseline
+          python -m unittest discover -s tests_registry -v
+          python -m unittest discover -s tests_cal_compat -v
+      - name: Bounded intake, faults and explicit recovery
+        run: |
+          python -m unittest discover -s tests_intake -v
+          python -O -m unittest discover -s tests_intake -v
+  console-owner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      RI_CHECKOUT: ${{ github.workspace }}
+      CONSOLE_OWNER_CHECKOUT: ${{ github.workspace }}/.upstream/console-owner
+      PYTHONPATH: ${{ github.workspace }}/src
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OpenRGD/rgd-console
+          ref: 82049654438cc2061d17643440806ad09ed684e5
+          path: .upstream/console-owner
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify exact owner and frozen RI schema
+        run: |
+          test "$(git -C "$CONSOLE_OWNER_CHECKOUT" rev-parse HEAD)" = 82049654438cc2061d17643440806ad09ed684e5
+          test "$(git hash-object contracts/consumer-observation-ref.v0.1-candidate.schema.json)" = 3d92e074e71593bf6db0a735394c628ea131668d
+          python -m pip install "jsonschema==4.23.0"
+      - name: Existing Console regression and new intake-to-owner correlation
+        run: |
+          python -m unittest discover -s "$CONSOLE_OWNER_CHECKOUT/scripts/tests" -p 'test_ri_periph_compat.py' -v
+          python -m unittest discover -s tests_intake_external -v
