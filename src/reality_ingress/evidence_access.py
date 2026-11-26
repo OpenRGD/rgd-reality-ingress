@@ -105,7 +105,12 @@ def _unavailable(reason, availability="UNAVAILABLE"):
 
 def _ref_profile(ref):
     """Validate supported local projection domain, not arbitrary new schemas."""
-    _require(type(ref) is dict and ref.get("schema_version") ==
+    _require(type(ref) is dict and set(ref) == {
+        "schema_version", "observation_id", "source_id", "modality", "reference_frame_id",
+        "sample_sequence", "payload_sha256_hex", "payload_media_type", "payload_size_bytes",
+        "origin_status", "integrity_status", "source_verified", "robot_binding_verified",
+        "history_committed", "actuation_enabled", "time",
+    } and ref.get("schema_version") ==
              "ri.consumer-observation-ref.v0.1-candidate", "INVALID_REFERENCE")
     _require(type(ref.get("observation_id")) is str and _ID.fullmatch(ref["observation_id"])
              and type(ref.get("payload_sha256_hex")) is str and
@@ -119,7 +124,10 @@ def _ref_profile(ref):
              "UNSUPPORTED_REFERENCE_AUTHORITY")
     check_ref_integer_domain(ref)
     time = ref["time"]
-    _require(type(time) is dict and time.get("source_time_status") == "unknown" and
+    _require(type(time) is dict and set(time) == {
+        "clock_domain_id", "boot_id", "received_monotonic_ns", "source_time_status",
+        "source_measurement_time", "chronograf_anchor_ref",
+    } and time.get("source_time_status") == "unknown" and
              "source_measurement_time" in time and time["source_measurement_time"] is None and
              "chronograf_anchor_ref" in time and time["chronograf_anchor_ref"] is None,
              "UNSUPPORTED_TIME_AUTHORITY")
