@@ -1,0 +1,64 @@
+name: RI-A02B CAL native compatibility
+on:
+  pull_request:
+    paths:
+      - "docs/compatibility/registry.snapshot-2026-11-26-cal-021-c.json"
+      - "docs/RI-A02B-CAL-COMPATIBILITY.md"
+      - "src/reality_ingress/interop_numeric.py"
+      - "tests_cal_compat/**"
+      - "tests_cal_external/**"
+      - ".github/workflows/ri-a02b-cal-compat.yml"
+permissions:
+  contents: read
+jobs:
+  profile:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install "jsonschema==4.23.0"
+      - name: Validate frozen baseline and appended CAL snapshot
+        run: |
+          python scripts/check_compat_registry.py --git-baseline
+          PYTHONPATH=src python -m unittest discover -s tests_cal_compat -v
+  actual-cal-probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CAL_CHECKOUT: ${{ github.workspace }}/.upstream/cal
+      CAL_PROBE: ${{ github.workspace }}/.upstream/cal/target/debug/examples/contract_exchange
+      PYTHONPATH: ${{ github.workspace }}/src
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OpenRGD/rgd-calibration
+          ref: 646dbc05bcefd15942b25bb55b3c99096f0cccc9
+          path: .upstream/cal
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Verify original schema and exact CAL owner pin
+        run: |
+          test "$(git -C "$CAL_CHECKOUT" rev-parse HEAD)" = 646dbc05bcefd15942b25bb55b3c99096f0cccc9
+          test "$(git hash-object contracts/consumer-observation-ref.v0.1-candidate.schema.json)" = 3d92e074e71593bf6db0a735394c628ea131668d
+          test "$(git hash-object "$CAL_CHECKOUT/contracts/ri-calibration-association.v0.1-candidate.schema.json")" = 6c26a4d3618721326326a0cb2966a5137f6d87fe
+          test "$(git hash-object "$CAL_CHECKOUT/src/ri_association.rs")" = 815c20efc4acf60d943d7214455b85f871209bb3
+          python -m pip install "jsonschema==4.23.0"
+      - name: Build exact CAL test-only exporter
+        run: cargo build --locked --manifest-path "$CAL_CHECKOUT/Cargo.toml" --features ri-candidate --example contract_exchange
+      - name: Test native bounds and separately validate original RI ref and CAL sidecar
+        run: python -m unittest discover -s tests_cal_external -v

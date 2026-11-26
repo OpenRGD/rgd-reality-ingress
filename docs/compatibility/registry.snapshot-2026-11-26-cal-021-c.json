@@ -1,0 +1,678 @@
+{
+  "registry_version": "ri.compatibility-registry.v0.1-candidate",
+  "snapshot_date": "2026-11-26",
+  "normative": false,
+  "runtime_authority": false,
+  "physical_commissioning": false,
+  "baseline": {
+    "repository": "OpenRGD/rgd-reality-ingress",
+    "pull_request": 4,
+    "commit": "5372f758df79c93fc887f3858d878635447f4a4d",
+    "contract_id": "ri.consumer-observation-ref.v0.1-candidate",
+    "schema_path": "contracts/consumer-observation-ref.v0.1-candidate.schema.json",
+    "schema_git_blob_sha1": "3d92e074e71593bf6db0a735394c628ea131668d",
+    "frozen_files": [
+      {
+        "path": "contracts/consumer-observation-ref.v0.1-candidate.schema.json",
+        "git_blob_sha1": "3d92e074e71593bf6db0a735394c628ea131668d"
+      },
+      {
+        "path": "pyproject.toml",
+        "git_blob_sha1": "1452bd061c028f76e9f6382a06bd02b55f798f75"
+      },
+      {
+        "path": "src/reality_ingress/__init__.py",
+        "git_blob_sha1": "30f9ef2c7861245d2090ca81e803e1dc24248b1f"
+      },
+      {
+        "path": "src/reality_ingress/__main__.py",
+        "git_blob_sha1": "4e28416e104515e90fca4b69cc60d0c61fd15d61"
+      },
+      {
+        "path": "src/reality_ingress/calibration.py",
+        "git_blob_sha1": "7f3d5559074d7f92feacc0bd2c00a293cf557989"
+      },
+      {
+        "path": "src/reality_ingress/camera.py",
+        "git_blob_sha1": "02457ad7bf5fe2c40246f8ddbd3adace64385bf0"
+      },
+      {
+        "path": "src/reality_ingress/cli.py",
+        "git_blob_sha1": "8cff9d013478e85a19400400cfca8b2130fc996b"
+      },
+      {
+        "path": "src/reality_ingress/consumer_ref.py",
+        "git_blob_sha1": "a34f4cbd924b58c849af215d175500f5a5ca2ece"
+      },
+      {
+        "path": "src/reality_ingress/consumers.py",
+        "git_blob_sha1": "a7769f98832cb61c2c98d637b55ba020021474fe"
+      },
+      {
+        "path": "src/reality_ingress/derivations.py",
+        "git_blob_sha1": "47ee85073cc3d8a86939960aa9ae62847ec19950"
+      },
+      {
+        "path": "src/reality_ingress/evidence.py",
+        "git_blob_sha1": "b8d91cb52c8aadbedd23b2380d8d10e127eda7ce"
+      },
+      {
+        "path": "src/reality_ingress/fiducials.py",
+        "git_blob_sha1": "88bfdb571b6aafbd7b1be7dc001be2916c2480d4"
+      },
+      {
+        "path": "src/reality_ingress/generic.py",
+        "git_blob_sha1": "ce37925610314302b6332cff5dd342dc6ac36df0"
+      },
+      {
+        "path": "src/reality_ingress/model.py",
+        "git_blob_sha1": "75d18c131e6855148be10df0205f8f783b739243"
+      },
+      {
+        "path": "src/reality_ingress/perception.py",
+        "git_blob_sha1": "56e98716765885cfcb5c6bc3168be27fbea051c8"
+      },
+      {
+        "path": "src/reality_ingress/synthetic.py",
+        "git_blob_sha1": "dcd8eca2be19e310ba5d355197e08c1a593e3fc4"
+      },
+      {
+        "path": "src/reality_ingress/telemetry_hook.py",
+        "git_blob_sha1": "ed45db8ae92bc6604ac2d60fa7fe129f5396d808"
+      },
+      {
+        "path": "src/reality_ingress/temporal_probe.py",
+        "git_blob_sha1": "581de839a82e069c83fd06237d4057ceec03b266"
+      },
+      {
+        "path": "src/reality_ingress/timebase.py",
+        "git_blob_sha1": "f6e2bdc998cd8e63822a225c5276cf7536926e58"
+      },
+      {
+        "path": "tests/test_consumer_ref.py",
+        "git_blob_sha1": "49dd4d141cfc80b56227b19266333287dd26016c"
+      },
+      {
+        "path": "tests/test_derivations.py",
+        "git_blob_sha1": "c46b2db3b8e6b06732e11dc49f44d027a4ad5d55"
+      },
+      {
+        "path": "tests/test_fiducials.py",
+        "git_blob_sha1": "2f52326130f8725c5b420a29ea6ff803320e5735"
+      },
+      {
+        "path": "tests/test_ingress.py",
+        "git_blob_sha1": "86cd09722a10181509301e8eb6c6e1a07cb157ae"
+      },
+      {
+        "path": "tests/test_multisource.py",
+        "git_blob_sha1": "269a75370f7cb7f7892d5e1479f41c9031427e81"
+      }
+    ]
+  },
+  "targets": [
+    {
+      "id": "RI-H01",
+      "name": "Paky-01 cameras",
+      "status": "awaiting_return",
+      "integrations": [],
+      "open_gates": [
+        "RI-A02",
+        "RI-A03",
+        "RI-A06",
+        "RI-A07",
+        "RI-A08"
+      ]
+    },
+    {
+      "id": "RI-H02",
+      "name": "Console / PERIPH / IMU",
+      "status": "candidate_compatible",
+      "integrations": [
+        {
+          "id": "IMU-RI-01",
+          "repository": "italiarobotica/paky-01",
+          "pull_request": 8,
+          "commit": "2e673242337f483db62970a910d942f53628d914",
+          "return_comment_id": 7162875841,
+          "pr_state_at_review": "open_draft",
+          "verification_kind": "pinned_ri_implementation",
+          "scope": "Bounded producer-side generic JSONL export and actual RI ingest/ref interoperability, synthetic serial/HTTP.",
+          "limits": [
+            "One reader; no continuous export; host pilot pending; no source attestation."
+          ],
+          "artifacts": [
+            {
+              "path": "scripts/imu_ri_export.py",
+              "git_blob_sha1": "495255dbd72de4cbb672f34568807a90a17b0153"
+            },
+            {
+              "path": "tests/test_imu_ri_export.py",
+              "git_blob_sha1": "ff6604d75d3ac6bd76c7ce9164bfbebc3aff8e6e"
+            }
+          ],
+          "checks": [
+            {
+              "run_id": 45617081230,
+              "tested_commit": "2e673242337f483db62970a910d942f53628d914",
+              "conclusion": "success",
+              "scope": "ri_conformance"
+            },
+            {
+              "run_id": 45617081289,
+              "tested_commit": "2e673242337f483db62970a910d942f53628d914",
+              "conclusion": "success",
+              "scope": "owner_checks"
+            }
+          ]
+        },
+        {
+          "id": "PERIPH-RI-01",
+          "repository": "OpenRGD/rgd-console",
+          "pull_request": 21,
+          "commit": "20d24d5a3a43c09141c02f0a9d68fde0b84c1f1e",
+          "return_comment_id": 7170923718,
+          "pr_state_at_review": "open_draft",
+          "verification_kind": "pinned_ri_implementation",
+          "scope": "Offline correlation of Console sample and RI-issued ref with authorized original payload bytes.",
+          "limits": [
+            "No live transport, no proof of Console boot ID; Foundation failure at this historical head."
+          ],
+          "artifacts": [
+            {
+              "path": "scripts/ri_periph_compat.py",
+              "git_blob_sha1": "34710eba7cecf0235cd2651edd286f5ac79a41fe"
+            },
+            {
+              "path": "scripts/tests/test_ri_periph_compat.py",
+              "git_blob_sha1": "bc612ab85a2c409b5866cda6847d7639ce88af99"
+            }
+          ],
+          "checks": [
+            {
+              "run_id": 45675183096,
+              "tested_commit": "20d24d5a3a43c09141c02f0a9d68fde0b84c1f1e",
+              "conclusion": "success",
+              "scope": "ri_conformance"
+            },
+            {
+              "run_id": 45675182930,
+              "tested_commit": "20d24d5a3a43c09141c02f0a9d68fde0b84c1f1e",
+              "conclusion": "failure",
+              "scope": "owner_checks"
+            }
+          ]
+        },
+        {
+          "id": "PERIPH-RI-01A",
+          "repository": "OpenRGD/rgd-console",
+          "pull_request": 22,
+          "commit": "82049654438cc2061d17643440806ad09ed684e5",
+          "return_comment_id": 7171928650,
+          "pr_state_at_review": "open_draft",
+          "verification_kind": "pinned_ri_implementation",
+          "scope": "Candidate stack reconciliation with released Console v0.4.3; same correlation helper and RI pin.",
+          "limits": [
+            "Draft stacked on #21; no deployment or commissioning; not a change to historical #21 results."
+          ],
+          "artifacts": [
+            {
+              "path": "contracts/console/v1/imu-observation.v0.1.schema.json",
+              "git_blob_sha1": "8ddbe8d7639e35f0a9442a80e27c9e49f882eb7c"
+            },
+            {
+              "path": "scripts/ri_periph_compat.py",
+              "git_blob_sha1": "34710eba7cecf0235cd2651edd286f5ac79a41fe"
+            },
+            {
+              "path": "scripts/tests/test_ri_periph_compat.py",
+              "git_blob_sha1": "bc612ab85a2c409b5866cda6847d7639ce88af99"
+            }
+          ],
+          "checks": [
+            {
+              "run_id": 45682504132,
+              "tested_commit": "82049654438cc2061d17643440806ad09ed684e5",
+              "conclusion": "success",
+              "scope": "ri_conformance"
+            },
+            {
+              "run_id": 45682504279,
+              "tested_commit": "82049654438cc2061d17643440806ad09ed684e5",
+              "conclusion": "success",
+              "scope": "owner_checks"
+            },
+            {
+              "run_id": 45682504275,
+              "tested_commit": "82049654438cc2061d17643440806ad09ed684e5",
+              "conclusion": "success",
+              "scope": "owner_checks"
+            }
+          ]
+        }
+      ],
+      "open_gates": [
+        "RI-A02",
+        "RI-A03",
+        "RI-A04",
+        "RI-A05",
+        "RI-A06",
+        "RI-A07",
+        "RI-A09",
+        "RI-A12"
+      ]
+    },
+    {
+      "id": "RI-H03",
+      "name": "Voice",
+      "status": "candidate_compatible",
+      "integrations": [
+        {
+          "id": "VOICE-RI-01",
+          "repository": "OpenRGD/rgd-voice",
+          "pull_request": 9,
+          "commit": "065ee67f2b1a80f0f1bad963ba9348c34d244aac",
+          "return_comment_id": 7171947147,
+          "pr_state_at_review": "open_draft",
+          "verification_kind": "metadata_only",
+          "scope": "Consent-limited, closed segment metadata report and local schema tests; no RI payload/record transport.",
+          "limits": [
+            "Metadata callback default disconnected; no PCM, transcript-to-ref, persistence or actual RI store conformance."
+          ],
+          "artifacts": [
+            {
+              "path": "contracts/voice-audio-segment-closed-report.v0.1-candidate.schema.json",
+              "git_blob_sha1": "ab6b3b66ec717223b7d6699181b560b6c475b3ed"
+            },
+            {
+              "path": "rgd_voice_lab/ri_segment_metadata.py",
+              "git_blob_sha1": "8f6ffc46994874d6c4b03b2a6490b8f30a7705f4"
+            },
+            {
+              "path": "tests/test_ri_segment_metadata.py",
+              "git_blob_sha1": "7e9dfc5cbc96f8b396f534a6fc4ecc2bb31b33f6"
+            }
+          ],
+          "checks": [
+            {
+              "run_id": 45682444005,
+              "tested_commit": "065ee67f2b1a80f0f1bad963ba9348c34d244aac",
+              "conclusion": "success",
+              "scope": "metadata_conformance"
+            },
+            {
+              "run_id": 45682443820,
+              "tested_commit": "065ee67f2b1a80f0f1bad963ba9348c34d244aac",
+              "conclusion": "success",
+              "scope": "owner_checks"
+            }
+          ]
+        }
+      ],
+      "open_gates": [
+        "RI-A02",
+        "RI-A03",
+        "RI-A04",
+        "RI-A05",
+        "RI-A06",
+        "RI-A07",
+        "RI-A08",
+        "RI-A09",
+        "RI-A12"
+      ]
+    },
+    {
+      "id": "RI-H04",
+      "name": "Calibration",
+      "status": "candidate_compatible",
+      "integrations": [
+        {
+          "id": "CAL-RI-01",
+          "repository": "OpenRGD/rgd-calibration",
+          "pull_request": 5,
+          "commit": "32b87d10fc80e714faf53312b4ac868693096363",
+          "return_comment_id": 7170932271,
+          "pr_state_at_review": "open_draft",
+          "verification_kind": "pinned_contract_fixture",
+          "scope": "Read-only Rust sidecar association and candidate ref fixture/contract checks.",
+          "limits": [
+            "No metric depth approval, no validated device/frame, no payload resolver, no actual sensor trial."
+          ],
+          "artifacts": [
+            {
+              "path": "contracts/ri-calibration-association.v0.1-candidate.schema.json",
+              "git_blob_sha1": "3b6cba27528cdc2c25b44b8e2e442bc933e2ec60"
+            },
+            {
+              "path": "src/ri_association.rs",
+              "git_blob_sha1": "4ae3b86063e65340dc50dfb32ce4d03e22b7a945"
+            },
+            {
+              "path": "tests/ri_association.rs",
+              "git_blob_sha1": "eed79793f373df4ecbbd7c7bf1d93d246dd65d49"
+            }
+          ],
+          "checks": [
+            {
+              "run_id": 45675122541,
+              "tested_commit": "32b87d10fc80e714faf53312b4ac868693096363",
+              "conclusion": "success",
+              "scope": "contract_fixture_conformance"
+            }
+          ]
+        },
+        {
+          "id": "CAL-021-C",
+          "repository": "OpenRGD/rgd-calibration",
+          "pull_request": 9,
+          "commit": "646dbc05bcefd15942b25bb55b3c99096f0cccc9",
+          "return_comment_id": 7191153648,
+          "pr_state_at_review": "open_review",
+          "verification_kind": "pinned_ri_implementation",
+          "scope": "Producer-to-CAL synthetic offline contract exchange against RI-A02 checkout 161318d2897d07d5628ef502cafba1c7c489fff0, frozen RI schema blob 3d92e074e71593bf6db0a735394c628ea131668d and consumer_ref.py blob a34f4cbd924b58c849af215d175500f5a5ca2ece. 5 accepted refs, 3 actual producer projections (verified camera, unverified camera, unverified generic), 20 Rust sidecars, 14 rejected inputs, actual store corruption rejected.",
+          "limits": [
+            "A02 resolve_session NOT executed by CAL #9; no real reader, availability, ACL, source/session authority, physical commissioning or depth.",
+            "Generic producer projection was not a verified stored generic observation. Boundary mutations are synthetic. RI v0.1 schema unbounded integer domain differs from CAL u64.",
+            "CAL #5 fixture-only evidence remains historical; no Registry repin or owner merge authorized."
+          ],
+          "artifacts": [
+            {
+              "path": "docs/handoffs/CAL-021-C-TO-REALITY-INGRESS.md",
+              "git_blob_sha1": "8fcf6b276cf472a61af087a381f141d6edd90315"
+            },
+            {
+              "path": "contracts/ri-calibration-association.v0.1-candidate.schema.json",
+              "git_blob_sha1": "6c26a4d3618721326326a0cb2966a5137f6d87fe"
+            },
+            {
+              "path": "src/ri_association.rs",
+              "git_blob_sha1": "815c20efc4acf60d943d7214455b85f871209bb3"
+            },
+            {
+              "path": "scripts/test_contract_exchange.py",
+              "git_blob_sha1": "3164ec2ed189115243a25420607ace4554cd426d"
+            },
+            {
+              "path": "examples/contract_exchange.rs",
+              "git_blob_sha1": "e5cda48ef14b99c025a638a6875ef2e3cfed2aa5"
+            },
+            {
+              "path": ".github/workflows/cal-021-c-contracts.yml",
+              "git_blob_sha1": "fc94e569c19619988205965471a3b46ca3a22022"
+            }
+          ],
+          "checks": [
+            {
+              "run_id": 45806326568,
+              "tested_commit": "646dbc05bcefd15942b25bb55b3c99096f0cccc9",
+              "conclusion": "success",
+              "scope": "ri_conformance"
+            },
+            {
+              "run_id": 45806326787,
+              "tested_commit": "646dbc05bcefd15942b25bb55b3c99096f0cccc9",
+              "conclusion": "success",
+              "scope": "owner_checks"
+            },
+            {
+              "run_id": 45806326721,
+              "tested_commit": "646dbc05bcefd15942b25bb55b3c99096f0cccc9",
+              "conclusion": "success",
+              "scope": "owner_checks"
+            },
+            {
+              "run_id": 45806326552,
+              "tested_commit": "646dbc05bcefd15942b25bb55b3c99096f0cccc9",
+              "conclusion": "success",
+              "scope": "owner_checks"
+            },
+            {
+              "run_id": 45806317154,
+              "tested_commit": "646dbc05bcefd15942b25bb55b3c99096f0cccc9",
+              "conclusion": "success",
+              "scope": "ri_conformance"
+            },
+            {
+              "run_id": 45806317256,
+              "tested_commit": "646dbc05bcefd15942b25bb55b3c99096f0cccc9",
+              "conclusion": "success",
+              "scope": "owner_checks"
+            },
+            {
+              "run_id": 45806317372,
+              "tested_commit": "646dbc05bcefd15942b25bb55b3c99096f0cccc9",
+              "conclusion": "success",
+              "scope": "owner_checks"
+            },
+            {
+              "run_id": 45806317190,
+              "tested_commit": "646dbc05bcefd15942b25bb55b3c99096f0cccc9",
+              "conclusion": "success",
+              "scope": "owner_checks"
+            }
+          ]
+        }
+      ],
+      "open_gates": [
+        "RI-A02",
+        "RI-A03",
+        "RI-A04",
+        "RI-A05",
+        "RI-A07",
+        "RI-A08",
+        "RI-A10",
+        "RI-A12"
+      ]
+    },
+    {
+      "id": "RI-H05",
+      "name": "Cognition",
+      "status": "candidate_compatible",
+      "integrations": [
+        {
+          "id": "COG-RI-01",
+          "repository": "OpenRGD/rgd-cognition",
+          "pull_request": 8,
+          "commit": "29a8a0b60ce365d2a0fd1f38313a3a319793bc6a",
+          "return_comment_id": 7162904557,
+          "pr_state_at_review": "open_draft",
+          "verification_kind": "pinned_ri_implementation",
+          "scope": "Strict read-only metadata consumer against actual pinned RI producer; inert local notice.",
+          "limits": [
+            "No goal admission, no IMU numeric replacement, no verified identity, no History or actuation."
+          ],
+          "artifacts": [
+            {
+              "path": "src/rgd_cognition/ri_observation_ref.py",
+              "git_blob_sha1": "b31f6e502b69192b18298f8ddc2941f02f42a178"
+            },
+            {
+              "path": "src/rgd_cognition/schemas/ri-reference-notice.schema.json",
+              "git_blob_sha1": "4f7fbd9519d5e352e94b110504b07622c40a03cf"
+            },
+            {
+              "path": "tests_ri/test_ri_observation_ref.py",
+              "git_blob_sha1": "f87ca97c5ba43e2b14fddcf7fe67f67a4d154dd3"
+            }
+          ],
+          "checks": [
+            {
+              "run_id": 45617001542,
+              "tested_commit": "29a8a0b60ce365d2a0fd1f38313a3a319793bc6a",
+              "conclusion": "success",
+              "scope": "ri_conformance"
+            }
+          ]
+        }
+      ],
+      "open_gates": [
+        "RI-A02",
+        "RI-A04",
+        "RI-A05",
+        "RI-A06",
+        "RI-A08",
+        "RI-A11"
+      ]
+    },
+    {
+      "id": "RI-H06",
+      "name": "Visual Feedback",
+      "status": "candidate_compatible",
+      "integrations": [
+        {
+          "id": "VISUAL-RI-01",
+          "repository": "OpenRGD/rgd-visual-feedback",
+          "pull_request": 11,
+          "commit": "2bc1374a17739f607851c8a0197d98a9b78f81cb",
+          "return_comment_id": 7170859044,
+          "pr_state_at_review": "open_draft",
+          "verification_kind": "pinned_contract_boundary",
+          "scope": "Offline report projection with pinned RI schema boundary tests; reports intentionally not RI references.",
+          "limits": [
+            "No sensor sample, no optical proof, no gaze/LED authority, no RI report ingestion."
+          ],
+          "artifacts": [
+            {
+              "path": "contracts/ri-status-report.v0.1-candidate.schema.json",
+              "git_blob_sha1": "fe6d2e13cbc7386fbcf0a3d0e3cbb4361a8fb4b2"
+            },
+            {
+              "path": "tests/fixtures/ri/consumer-observation-ref.pinned.schema.json",
+              "git_blob_sha1": "3d92e074e71593bf6db0a735394c628ea131668d"
+            },
+            {
+              "path": "tests/test_ri_report.py",
+              "git_blob_sha1": "3eb5d43fc2c5dfec7c33139ea7c7eaeac7ee3605"
+            }
+          ],
+          "checks": [
+            {
+              "run_id": 45674623445,
+              "tested_commit": "2bc1374a17739f607851c8a0197d98a9b78f81cb",
+              "conclusion": "success",
+              "scope": "schema_boundary_conformance"
+            },
+            {
+              "run_id": 45674623189,
+              "tested_commit": "2bc1374a17739f607851c8a0197d98a9b78f81cb",
+              "conclusion": "success",
+              "scope": "owner_checks"
+            }
+          ]
+        }
+      ],
+      "open_gates": [
+        "RI-A04",
+        "RI-A06",
+        "RI-A08",
+        "RI-A09"
+      ]
+    },
+    {
+      "id": "RI-H07",
+      "name": "Perception",
+      "status": "blocked_repo_pending",
+      "integrations": [],
+      "open_gates": [
+        "RI-A08",
+        "RI-A10"
+      ]
+    },
+    {
+      "id": "RI-H08",
+      "name": "Pulse / Chronoscope",
+      "status": "review_only",
+      "integrations": [
+        {
+          "id": "PULSE-RI-REVIEW",
+          "repository": "OpenRGD/rgd-pulse",
+          "pull_request": 14,
+          "commit": "d811f5daea323010f226e4454025efeb8a64a637",
+          "return_comment_id": 7171857174,
+          "pr_state_at_review": "open_draft",
+          "verification_kind": "documentary_review",
+          "scope": "Owner review only; preserve existing K3 and separate K2/K4.",
+          "limits": [
+            "No RI adapter, runtime conformance, firmware change or new USB protocol."
+          ],
+          "artifacts": [
+            {
+              "path": "docs/handoffs/RI-INTEGRATION-01-PULSE-REVIEW.md",
+              "git_blob_sha1": "c4d226d50d109a5be6f60137d9f6fcf47afddb35"
+            }
+          ],
+          "checks": []
+        }
+      ],
+      "open_gates": [
+        "RI-A04",
+        "RI-A06",
+        "RI-A09",
+        "RI-A11"
+      ]
+    },
+    {
+      "id": "RI-H09",
+      "name": "Robot Chronograf",
+      "status": "awaiting_return",
+      "integrations": [],
+      "open_gates": [
+        "RI-A06",
+        "RI-A11"
+      ]
+    },
+    {
+      "id": "RI-H10",
+      "name": "Canonical Core / Identity / History",
+      "status": "candidate_compatible",
+      "integrations": [
+        {
+          "id": "CORE-RI-01",
+          "repository": "OpenRGD/openrgd",
+          "pull_request": 17,
+          "commit": "1a0f3f0408df8b6f86ab2bf1dcfe5eccc9e826a7",
+          "return_comment_id": 7172152368,
+          "pr_state_at_review": "open_draft",
+          "verification_kind": "pinned_ri_implementation",
+          "scope": "Characterization of actual RI camera/generic producer, reference, identity and History boundaries against pinned Core selectors.",
+          "limits": [
+            "Camera metadata not fully integrity-bound by payload verification; generic envelope alteration rejected. No new authority or History writer."
+          ],
+          "artifacts": [
+            {
+              "path": ".github/workflows/core-ri-conformance.yml",
+              "git_blob_sha1": "4d2cf94f742008a4058c4ba0d800c5211c1a3072"
+            },
+            {
+              "path": "docs/reconciliation/ri/CORE_RI_01.md",
+              "git_blob_sha1": "2ac3eaacbb417b031b0f2a9b9dc25f8c96ae29f4"
+            }
+          ],
+          "checks": [
+            {
+              "run_id": 45684004810,
+              "tested_commit": "1a0f3f0408df8b6f86ab2bf1dcfe5eccc9e826a7",
+              "conclusion": "success",
+              "scope": "ri_conformance"
+            },
+            {
+              "run_id": 45684004618,
+              "tested_commit": "1a0f3f0408df8b6f86ab2bf1dcfe5eccc9e826a7",
+              "conclusion": "success",
+              "scope": "owner_checks"
+            }
+          ]
+        }
+      ],
+      "open_gates": [
+        "RI-A02",
+        "RI-A04",
+        "RI-A05",
+        "RI-A06",
+        "RI-A08",
+        "RI-A11",
+        "RI-A12"
+      ]
+    }
+  ]
+}
