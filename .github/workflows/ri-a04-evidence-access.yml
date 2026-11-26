@@ -1,0 +1,63 @@
+name: RI-A04 evidence access
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  local-policy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install -e . "jsonschema==4.23.0"
+      - name: Frozen baseline and local access tests
+        run: |
+          python scripts/check_compat_registry.py --git-baseline
+          python -m unittest discover -s tests_access -v
+          python -O -m unittest discover -s tests_access -v
+  owner-consumers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      CONSOLE_OWNER_CHECKOUT: ${{ github.workspace }}/.upstream/console-owner
+      COG_OWNER_CHECKOUT: ${{ github.workspace }}/.upstream/cog
+      PYTHONPATH: ${{ github.workspace }}/src:${{ github.workspace }}/.upstream/cog/src
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OpenRGD/rgd-console
+          ref: 82049654438cc2061d17643440806ad09ed684e5
+          path: .upstream/console-owner
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OpenRGD/rgd-cognition
+          ref: 9235d3759b263bfde2d8644c46845e9a338e9238
+          path: .upstream/cog
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify exact owner and frozen reference pins
+        run: |
+          test "$(git -C "$CONSOLE_OWNER_CHECKOUT" rev-parse HEAD)" = 82049654438cc2061d17643440806ad09ed684e5
+          test "$(git -C "$COG_OWNER_CHECKOUT" rev-parse HEAD)" = 9235d3759b263bfde2d8644c46845e9a338e9238
+          test "$(git hash-object contracts/consumer-observation-ref.v0.1-candidate.schema.json)" = 3d92e074e71593bf6db0a735394c628ea131668d
+          python -m pip install -r "$COG_OWNER_CHECKOUT/requirements-ci.txt"
+      - name: Actual owner consumers with authorized-style local synthetic views
+        run: python -m unittest discover -s tests_access_external -v
