@@ -167,6 +167,8 @@ def _fingerprint(info):
 
 def _read_private_file(dir_fd, name, limit, *, missing_ok=False):
     try:
+        listed = os.stat(name, dir_fd=dir_fd, follow_symlinks=False)
+        _require(stat.S_ISREG(listed.st_mode), "PRIVATE_REGULAR_FILE_REQUIRED")
         fd = os.open(name, os.O_RDONLY | os.O_NONBLOCK | os.O_NOFOLLOW, dir_fd=dir_fd)
     except FileNotFoundError:
         if missing_ok:
@@ -177,6 +179,7 @@ def _read_private_file(dir_fd, name, limit, *, missing_ok=False):
         _require(stat.S_ISREG(before.st_mode) and before.st_uid == os.getuid()
                  and stat.S_IMODE(before.st_mode) == 0o600 and before.st_nlink == 1,
                  "PRIVATE_REGULAR_FILE_REQUIRED")
+        _require(_fingerprint(listed) == _fingerprint(before), "FILE_CHANGED_DURING_READ")
         _require(before.st_size <= limit, "FILE_BYTE_LIMIT")
         chunks = bytearray()
         while len(chunks) <= limit:
@@ -389,7 +392,10 @@ def _existing(path: Path, expected: bytes):
 
 
 def _preflight_store(store, records):
-    _require(type(store) is EvidenceStore, "EXPLICIT_LEGACY_STORE_REQUIRED")
+    _require(type(store) is EvidenceStore and
+             store.payloads == store.root / "payloads" and
+             store.observations == store.root / "observations",
+             "EXPLICIT_LEGACY_STORE_REQUIRED")
     for folder in (store.payloads, store.observations):
         fd = _owner_dir(folder)
         os.close(fd)
@@ -429,6 +435,8 @@ def apply_spool(store: EvidenceStore, directory, scope: SourceScope, completion_
             fcntl.flock(root_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
             return replace(result, status="REJECTED", reason="INTAKE_BUSY")
+        except OSError:
+            return replace(result, status="REJECTED", reason="INTAKE_LOCK_UNAVAILABLE")
         try:
             _preflight_store(store, records)
         except IntakeError as exc:
