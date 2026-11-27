@@ -9,6 +9,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
+from jsonschema import Draft202012Validator
 from reality_ingress import integrity_inspection as integrity
 from reality_ingress.evidence import EvidenceStore
 from reality_ingress.consumer_ref import verified_ref_from_store
@@ -73,6 +74,18 @@ class IntegrityTests(unittest.TestCase):
         self.assertFalse(result.actuation_enabled)
         self.assertNotIn(self.obs,repr(result))
         self.assertNotIn(str(self.root),repr(result))
+
+    def test_checkpoint_schema_closed_and_no_false_authority(self):
+        root=Path(__file__).resolve().parents[1]
+        schema=json.loads((root/"contracts/integrity-checkpoint.v0.1-candidate.schema.json").read_text())
+        Draft202012Validator.check_schema(schema)
+        validator=Draft202012Validator(schema)
+        record=json.loads(self.check().checkpoint.canonical_bytes())
+        validator.validate(record)
+        self.assertFalse(validator.is_valid(dict(record,source_verified=True)))
+        self.assertFalse(validator.is_valid(dict(record,payload_size_bytes=-1)))
+        self.assertFalse(validator.is_valid(dict(record,envelope_sha256="bad")))
+        self.assertFalse(validator.is_valid(dict(record,envelope_size_bytes=65537)))
 
     def test_checkpoint_matches_only_independent_expected_digest(self):
         first=self.check()
