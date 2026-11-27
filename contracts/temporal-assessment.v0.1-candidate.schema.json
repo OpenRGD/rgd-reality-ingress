@@ -1,0 +1,459 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:openrgd:reality-ingress:temporal-assessment:v0.1-candidate",
+  "title": "Stored evidence temporal assessment, no live or time authority",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "observation_id",
+    "reference_content_sha256",
+    "payload_sha256_hex",
+    "presentation",
+    "sequence_relation",
+    "source_session_id",
+    "original_receipt",
+    "publisher_host_label",
+    "receipt_clock_relation",
+    "receipt_age_ns",
+    "receipt_age_state",
+    "receipt_age_limit_ns",
+    "assessment_clock",
+    "assessment_monotonic_ns",
+    "import_mark",
+    "verification_mark",
+    "source_measurement_time",
+    "source_time_status",
+    "source_measurement_freshness",
+    "source_time_uncertainty_ns",
+    "chronograf_anchor_ref",
+    "chronograf_status",
+    "live_delivery",
+    "source_verified",
+    "robot_binding_verified",
+    "history_committed",
+    "actuation_enabled",
+    "decision_eligible"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "ri.temporal-assessment.v0.1-candidate"
+    },
+    "observation_id": {
+      "type": "string",
+      "pattern": "^obs_[0-9a-f]{32}$"
+    },
+    "reference_content_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "payload_sha256_hex": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "presentation": {
+      "enum": [
+        "ARCHIVE_READ",
+        "IMPORT",
+        "REIMPORT",
+        "REPLAY",
+        "SYNTHETIC",
+        "UNKNOWN"
+      ]
+    },
+    "sequence_relation": {
+      "enum": [
+        "FIRST_IN_SCOPE",
+        "IN_ORDER",
+        "OUT_OF_ORDER",
+        "NOT_RESOLVED"
+      ]
+    },
+    "source_session_id": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "original_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "clock_domain_id",
+        "boot_id",
+        "received_monotonic_ns",
+        "received_unix_estimate_ns",
+        "host_wall_pair_span_ns",
+        "receive_timestamp_method"
+      ],
+      "properties": {
+        "clock_domain_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "boot_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "received_monotonic_ns": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 18446744073709551615
+        },
+        "received_unix_estimate_ns": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 18446744073709551615
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "host_wall_pair_span_ns": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 18446744073709551615
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "receive_timestamp_method": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "publisher_host_label": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "receipt_clock_relation": {
+      "enum": [
+        "HOST_SAME_BOOT_ASSERTED",
+        "NOT_ESTABLISHED"
+      ]
+    },
+    "receipt_age_ns": {
+      "anyOf": [
+        {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 18446744073709551615
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "receipt_age_state": {
+      "enum": [
+        "UNKNOWN",
+        "STALE_RECEIPT",
+        "RECENT_RECEIPT"
+      ]
+    },
+    "receipt_age_limit_ns": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 60000000000
+    },
+    "assessment_clock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "host_label",
+        "clock_domain_id",
+        "boot_id"
+      ],
+      "properties": {
+        "host_label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "clock_domain_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "boot_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128
+        }
+      }
+    },
+    "assessment_monotonic_ns": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 18446744073709551615
+    },
+    "import_mark": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "operation",
+            "clock",
+            "monotonic_ns",
+            "quality"
+          ],
+          "properties": {
+            "operation": {
+              "const": "IMPORT"
+            },
+            "clock": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "host_label",
+                "clock_domain_id",
+                "boot_id"
+              ],
+              "properties": {
+                "host_label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "clock_domain_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "boot_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                }
+              }
+            },
+            "monotonic_ns": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 18446744073709551615
+            },
+            "quality": {
+              "const": "HOST_REPORTED"
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "verification_mark": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "operation",
+            "clock",
+            "monotonic_ns",
+            "quality"
+          ],
+          "properties": {
+            "operation": {
+              "const": "VERIFY"
+            },
+            "clock": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "host_label",
+                "clock_domain_id",
+                "boot_id"
+              ],
+              "properties": {
+                "host_label": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "clock_domain_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                },
+                "boot_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 128
+                }
+              }
+            },
+            "monotonic_ns": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 18446744073709551615
+            },
+            "quality": {
+              "const": "HOST_REPORTED"
+            }
+          }
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "source_measurement_time": {
+      "type": "null"
+    },
+    "source_time_status": {
+      "const": "UNKNOWN"
+    },
+    "source_measurement_freshness": {
+      "const": "UNKNOWN"
+    },
+    "source_time_uncertainty_ns": {
+      "type": "null"
+    },
+    "chronograf_anchor_ref": {
+      "type": "null"
+    },
+    "chronograf_status": {
+      "const": "UNRESOLVED"
+    },
+    "live_delivery": {
+      "const": false
+    },
+    "source_verified": {
+      "const": false
+    },
+    "robot_binding_verified": {
+      "const": false
+    },
+    "history_committed": {
+      "const": false
+    },
+    "actuation_enabled": {
+      "const": false
+    },
+    "decision_eligible": {
+      "const": false
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "receipt_clock_relation": {
+            "const": "NOT_ESTABLISHED"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "receipt_age_ns": {
+            "type": "null"
+          },
+          "receipt_age_state": {
+            "const": "UNKNOWN"
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "receipt_age_ns": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 18446744073709551615
+          },
+          "receipt_age_state": {
+            "enum": [
+              "RECENT_RECEIPT",
+              "STALE_RECEIPT"
+            ]
+          },
+          "source_session_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "publisher_host_label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "source_session_id": {
+            "type": "null"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "sequence_relation": {
+            "const": "NOT_RESOLVED"
+          },
+          "receipt_clock_relation": {
+            "const": "NOT_ESTABLISHED"
+          },
+          "publisher_host_label": {
+            "type": "null"
+          },
+          "original_receipt": {
+            "properties": {
+              "received_unix_estimate_ns": {
+                "type": "null"
+              },
+              "host_wall_pair_span_ns": {
+                "type": "null"
+              },
+              "receive_timestamp_method": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

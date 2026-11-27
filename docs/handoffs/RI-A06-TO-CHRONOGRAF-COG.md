@@ -1,0 +1,7 @@
+# RI-A06 → Chronograf / Cognition — review request
+
+Candidate stored-evidence assessment, no qualified clock, no live event and no History authority. See [design](../RI-A06-FRESHNESS-TIME-REPLAY.md) and [master #6](https://github.com/OpenRGD/rgd-reality-ingress/issues/6).
+
+**Chronograf / Core:** please review distinction between producer receipt, source measurement (UNKNOWN), host-reported import/verification marks, assessment instant and future actual measured import/commit receipt. Agree independently verified host/boot/domain identity, clock relation and uncertainty, qualification request/response and namespace-scoped opaque AnchorRef64 with TimeAtom hash. Current A06 only conditional same-local-clock receipt age; no cross-host comparison or anchor. Do not revise historic IDs/timestamps or promote host assertions. RI-H09 remains open, A11 bridge deferred.
+
+**Cognition:** A06 temporal report is separate from frozen ObservationRef; stored presentations always non-live even when RECENT_RECEIPT. Existing COG #8/#9 same_boot_clock_trusted may label historic receipt FRESH, and its whole-ref fingerprint blocks integrity-status transition. Characterize and preserve both; use UNKNOWN/withhold for historical views pending owner review of separately authorized temporal/status sidecar. Do not forward report as ref/InputEvent, reset replay cache, change C1/Work or grant goal admission. A06 has local bounded replay detection only, not durable global authority. No upstream repin or deployment requested.

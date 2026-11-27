@@ -1,0 +1,54 @@
+name: RI-A06 freshness time replay
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  temporal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install -e . "jsonschema==4.23.0"
+      - name: Frozen registry and temporal assessment tests
+        run: |
+          python scripts/check_compat_registry.py --git-baseline
+          python -m unittest discover -s tests_temporal -v
+          python -O -m unittest discover -s tests_temporal -v
+  cog-boundary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONPATH: ${{ github.workspace }}/src:${{ github.workspace }}/.upstream/cog/src
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OpenRGD/rgd-cognition
+          ref: 9235d3759b263bfde2d8644c46845e9a338e9238
+          path: .upstream/cog
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify exact owner and frozen reference
+        run: |
+          test "$(git -C .upstream/cog rev-parse HEAD)" = 9235d3759b263bfde2d8644c46845e9a338e9238
+          test "$(git hash-object contracts/consumer-observation-ref.v0.1-candidate.schema.json)" = 3d92e074e71593bf6db0a735394c628ea131668d
+          python -m pip install -r .upstream/cog/requirements-ci.txt
+      - name: Actual COG historical-view compatibility and characterization
+        run: python -m unittest discover -s tests_temporal_external -v
