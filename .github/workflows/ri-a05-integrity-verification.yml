@@ -1,0 +1,82 @@
+name: RI-A05 integrity verification
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  local-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install -e . "jsonschema==4.23.0"
+      - name: Verify original registry and new selected integrity checks
+        run: |
+          python scripts/check_compat_registry.py --git-baseline
+          python -m unittest discover -s tests_integrity -v
+          python -O -m unittest discover -s tests_integrity -v
+  core-characterization:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      RI_CHECKOUT: ${{ github.workspace }}
+      CORE_B_CHECKOUT: ${{ github.workspace }}/.upstream/core-b
+      CORE_C_CHECKOUT: ${{ github.workspace }}/.upstream/core-c
+      CORE_D_CHECKOUT: ${{ github.workspace }}/.upstream/core-d
+      PYTHONPATH: ${{ github.workspace }}/src
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OpenRGD/openrgd
+          ref: 1a0f3f0408df8b6f86ab2bf1dcfe5eccc9e826a7
+          path: .upstream/core-review
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OpenRGD/openrgd
+          ref: 55a034ceb1cdaab8bed6848fcdde85c9436bc9e0
+          path: .upstream/core-b
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OpenRGD/openrgd
+          ref: fa5e8ff713a28b69b7d39b2c18e8c9e0f6c72ee0
+          path: .upstream/core-c
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OpenRGD/openrgd
+          ref: 7b15fda5c825f9359ce0045377ec38364de19efb
+          path: .upstream/core-d
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Exact Core owner revisions and frozen RI schema
+        run: |
+          test "$(git -C .upstream/core-review rev-parse HEAD)" = 1a0f3f0408df8b6f86ab2bf1dcfe5eccc9e826a7
+          test "$(git -C "$CORE_B_CHECKOUT" rev-parse HEAD)" = 55a034ceb1cdaab8bed6848fcdde85c9436bc9e0
+          test "$(git -C "$CORE_C_CHECKOUT" rev-parse HEAD)" = fa5e8ff713a28b69b7d39b2c18e8c9e0f6c72ee0
+          test "$(git -C "$CORE_D_CHECKOUT" rev-parse HEAD)" = 7b15fda5c825f9359ce0045377ec38364de19efb
+          test "$(git hash-object contracts/consumer-observation-ref.v0.1-candidate.schema.json)" = 3d92e074e71593bf6db0a735394c628ea131668d
+          test "$(git hash-object .upstream/core-review/docs/reconciliation/ri/conformance.py)" = 3e9c0166ab57728d733d21fc9a9a84123b69234d
+          python -m pip install "jsonschema==4.23.0"
+      - name: Actual Core #17 characterization unchanged against additive RI
+        run: |
+          python .upstream/core-review/docs/reconciliation/ri/conformance.py
+          python -O .upstream/core-review/docs/reconciliation/ri/conformance.py

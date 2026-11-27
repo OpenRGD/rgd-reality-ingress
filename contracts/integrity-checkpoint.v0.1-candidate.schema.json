@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:openrgd:reality-ingress:integrity-checkpoint:v0.1-candidate",
+  "title": "Offline exact-byte checkpoint (candidate, not an attestation)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "observation_id",
+    "envelope_schema",
+    "envelope_sha256",
+    "envelope_size_bytes",
+    "payload_sha256",
+    "payload_size_bytes"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "ri.integrity-checkpoint.v0.1-candidate"
+    },
+    "observation_id": {
+      "type": "string",
+      "pattern": "^obs_[0-9a-f]{32}$"
+    },
+    "envelope_schema": {
+      "enum": [
+        "urn:openrgd:experimental:reality-ingress:observation-envelope:v0",
+        "urn:openrgd:experimental:reality-ingress:generic-observation:v0"
+      ]
+    },
+    "envelope_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "envelope_size_bytes": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 65536
+    },
+    "payload_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "payload_size_bytes": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 4194304
+    }
+  }
+}
