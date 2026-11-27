@@ -20,7 +20,7 @@ from .bounded_intake import IntakeError, _owner_dir, _read_private_file, _finger
 from .consumer_ref import unverified_ref_from_envelope
 from .generic import (
     SCHEMA_REF as GENERIC_SCHEMA, MAX_SAMPLE_BYTES, canonical_json,
-    envelope_from_sample, validate_sample,
+    envelope_from_sample, validate_sample, verify_generic_envelope,
 )
 from .session_binding import BindingError, CAMERA_SCHEMA, _decode
 
@@ -160,7 +160,8 @@ def _child(parent, name):
     try:
         yield fd
         st = os.stat(name, dir_fd=parent, follow_symlinks=False)
-        _require(stat.S_ISDIR(st.st_mode) and
+        _require(stat.S_ISDIR(st.st_mode) and st.st_uid == os.getuid() and
+                 stat.S_IMODE(st.st_mode) == 0o700 and
                  (st.st_dev, st.st_ino) == _dir_identity(fd), "STORE_DIRECTORY_CHANGED")
     finally:
         os.close(fd)
@@ -234,15 +235,16 @@ def verify_selected(root: Path, observation_id: str, *,
                 name = observation_id + ".json"
                 raw, env_identity = _read(obs_fd, name, max_envelope_bytes)
                 env, digest, size = _manifest(raw, observation_id)
-                _require(size <= max_payload_bytes, "PAYLOAD_BYTE_LIMIT")
+                limit = min(max_payload_bytes, MAX_SAMPLE_BYTES) if env["schema_ref_str"] == GENERIC_SCHEMA else max_payload_bytes
+                _require(size <= limit, "PAYLOAD_BYTE_LIMIT")
                 with _child(root_fd, "payloads") as payloads_fd:
                     with _child(payloads_fd, digest[:2]) as bucket_fd:
                         payload_name = digest + ".bin"
-                        payload, payload_identity = _read(bucket_fd, payload_name, max_payload_bytes)
+                        payload, payload_identity = _read(bucket_fd, payload_name, limit)
                         state, checkpoint = _verify_content(env, raw, payload, observation_id, digest, size)
                         # Re-read both selected files, not the entire store.
                         raw2, env2 = _read(obs_fd, name, max_envelope_bytes)
-                        payload2, payload2_id = _read(bucket_fd, payload_name, max_payload_bytes)
+                        payload2, payload2_id = _read(bucket_fd, payload_name, limit)
                         _require(raw2 == raw and payload2 == payload and env2 == env_identity
                                  and payload2_id == payload_identity, "FILE_CHANGED_DURING_READ")
                         _still_same(obs_fd, name, env_identity)
@@ -282,7 +284,6 @@ def _inventory(root_fd, max_entries, max_bytes):
     derivative stores, external replicas or physical data availability.
     """
     count = total = 0
-    referenced, present = set(), set()
 
     def names(fd):
         nonlocal count
@@ -297,19 +298,25 @@ def _inventory(root_fd, max_entries, max_bytes):
     def scan_observations(fd):
         nonlocal total
         before = _fingerprint(os.fstat(fd))
+        manifests = {}
         for name in names(fd):
             _require(name.endswith(".json") and _ID.fullmatch(name[:-5]),
                      "UNEXPECTED_OBSERVATION_ENTRY")
+            _require(total < max_bytes, "INVENTORY_BYTE_LIMIT")
             raw, identity = _read(fd, name, min(MAX_ENVELOPE_BYTES, max_bytes-total))
             total += len(raw)
             _require(total <= max_bytes, "INVENTORY_BYTE_LIMIT")
-            _, digest, _ = _manifest(raw, name[:-5])
-            referenced.add(digest)
+            env, digest, _ = _manifest(raw, name[:-5])
+            if env["schema_ref_str"] == GENERIC_SCHEMA:
+                verify_generic_envelope(env)
+            manifests[name] = (digest, identity, _sha(raw))
             _still_same(fd, name, identity)
         _require(before == _fingerprint(os.fstat(fd)), "INVENTORY_CHANGED")
+        return manifests, before
 
     def scan_payloads(fd):
         before = _fingerprint(os.fstat(fd))
+        files, buckets = {}, {}
         for bucket in names(fd):
             _require(_BUCKET.fullmatch(bucket), "UNEXPECTED_PAYLOAD_BUCKET")
             with _child(fd, bucket) as child:
@@ -322,28 +329,29 @@ def _inventory(root_fd, max_entries, max_bytes):
                     _require(stat.S_ISREG(info.st_mode) and info.st_uid == os.getuid()
                              and stat.S_IMODE(info.st_mode) == 0o600 and info.st_nlink == 1,
                              "PRIVATE_REGULAR_FILE_REQUIRED")
-                    present.add(digest)
+                    files[digest] = _fingerprint(info)
                 _require(stamp == _fingerprint(os.fstat(child)), "INVENTORY_CHANGED")
+                buckets[bucket] = stamp
         _require(before == _fingerprint(os.fstat(fd)), "INVENTORY_CHANGED")
+        return files, buckets, before
 
     with _child(root_fd, "observations") as obs_fd:
         with _child(root_fd, "payloads") as payload_fd:
-            # Repeat census under same cooperating-reader lock. This detects
-            # observed change, not a proof against an uncooperative same-UID writer.
-            scan_observations(obs_fd)
-            scan_payloads(payload_fd)
-            first = (set(referenced), set(present))
-            observed_count = count
-            referenced.clear()
-            present.clear()
-            scan_observations(obs_fd)
-            scan_payloads(payload_fd)
-            _require(first == (referenced, present), "INVENTORY_CHANGED")
+            # Repeat bounded census under same cooperating-reader lock,
+            # including manifest hashes and observed stat identities.
+            first_obs = scan_observations(obs_fd)
+            first_payloads = scan_payloads(payload_fd)
+            second_obs = scan_observations(obs_fd)
+            second_payloads = scan_payloads(payload_fd)
+            _require(first_obs == second_obs and first_payloads == second_payloads,
+                     "INVENTORY_CHANGED")
+            manifests = second_obs[0]
+            referenced = {v[0] for v in manifests.values()}
+            present = set(second_payloads[0])
             orphan = tuple(sorted(present - referenced))
             missing = tuple(sorted(referenced - present))
-            # Unique digest count differs from number of observation manifests.
             return InventoryReport("COMPLETE_CANDIDATE_CENSUS", "LOCAL_NAMESPACE_ONLY",
-                examined_entries=count, observation_manifests=len(names(obs_fd)),
+                examined_entries=count, observation_manifests=len(manifests),
                 payload_files=len(present), candidate_orphan_count=len(orphan),
                 missing_payload_count=len(missing), candidate_orphan_digests=orphan,
                 missing_payload_digests=missing)
