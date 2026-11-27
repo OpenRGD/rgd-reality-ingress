@@ -230,10 +230,22 @@ class TemporalTests(unittest.TestCase):
         self.assertEqual(d["sequence_relation"],"IN_ORDER")
 
     def test_receipt_order_conflicts(self):
-        self.report(self.assess())
+        self.report(self.assess(publisher_clock=self.claim))
         for seq,mono in ((8,3_800_000_000),(6,3_950_000_000)):
-            self.assertEqual(self.assess(self.additional(row_fixture(self.scope,seq,mono))).reason,
+            self.assertEqual(self.assess(self.additional(row_fixture(self.scope,seq,mono)),
+                                         publisher_clock=self.claim).reason,
                              "SOURCE_RECEIPT_ORDER_CONFLICT")
+
+    def test_unqualified_peers_never_compare_receipt_values(self):
+        self.report(self.assess())
+        d=self.report(self.assess(self.additional(row_fixture(self.scope,8,3_800_000_000))))
+        self.assertEqual(d["sequence_relation"],"IN_ORDER")
+        self.assertIsNone(d["receipt_age_ns"])
+        # Matching labels but no host assertion for the prior peer do not
+        # permit numerical comparison against it.
+        d=self.report(self.assess(self.additional(row_fixture(self.scope,9,3_700_000_000)),
+                                  publisher_clock=self.claim))
+        self.assertEqual(d["sequence_relation"],"IN_ORDER")
 
     def test_new_session_and_boot_scope_distinct(self):
         self.report(self.assess())

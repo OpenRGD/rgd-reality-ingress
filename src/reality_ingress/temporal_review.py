@@ -180,7 +180,7 @@ class TemporalReview:
         self._closed = False
         self._last = -1
         self._seen: dict[str, str] = {}
-        self._keys: dict[SessionKey, tuple[str, int]] = {}
+        self._keys: dict[SessionKey, tuple[str, int, bool]] = {}
 
     def _now(self):
         _require(not self._closed, "REVIEW_CLOSED")
@@ -213,22 +213,25 @@ class TemporalReview:
         return (key.source_id, key.modality, key.reference_frame_id,
                 key.session_id, key.clock_domain_id, key.boot_id)
 
-    def _sequence(self, key, obs, mono):
+    def _sequence(self, key, obs, mono, aligned):
         if key is None:
             return "NOT_RESOLVED"
         previous = self._keys.get(key)
-        _require(previous is None or previous == (obs, mono), "SESSION_SEQUENCE_COLLISION")
-        peers = [(k.sequence, received) for k, (_, received) in self._keys.items()
+        _require(previous is None or previous[:2] == (obs, mono), "SESSION_SEQUENCE_COLLISION")
+        peers = [(k.sequence, received, peer_aligned)
+                 for k, (_, received, peer_aligned) in self._keys.items()
                  if self._stream(k) == self._stream(key) and k != key]
-        # Later-arriving historical sequence can be out of order; its original
-        # receipt must still agree with sequence order in this same claimed scope.
-        for sequence, received in peers:
-            _require(not (key.sequence > sequence and mono < received)
-                     and not (key.sequence < sequence and mono > received),
-                     "SOURCE_RECEIPT_ORDER_CONFLICT")
+        # Sequence ordering refers only to the declared source/session scope.
+        # Compare receipt values only when BOTH records independently received
+        # the same local host/boot/domain assertion. Labels alone are not clocks.
+        for sequence, received, peer_aligned in peers:
+            if aligned and peer_aligned:
+                _require(not (key.sequence > sequence and mono < received)
+                         and not (key.sequence < sequence and mono > received),
+                         "SOURCE_RECEIPT_ORDER_CONFLICT")
         if not peers:
             return "FIRST_IN_SCOPE"
-        return "OUT_OF_ORDER" if key.sequence < max(s for s, _ in peers) else "IN_ORDER"
+        return "OUT_OF_ORDER" if key.sequence < max(s for s, _, _ in peers) else "IN_ORDER"
 
     def _mark(self, mark, operation, now):
         if mark is None:
@@ -264,10 +267,10 @@ class TemporalReview:
                 mono = original["received_monotonic_ns"]
                 known = self._seen.get(obs)
                 _require(known is None or known == fingerprint, "OBSERVATION_ID_COLLISION")
-                order = self._sequence(key, obs, mono)
                 aligned = (key is not None and publisher_clock is not None
                            and publisher_clock.matches(key)
                            and publisher_clock.clock == self._context)
+                order = self._sequence(key, obs, mono, aligned)
                 if aligned:
                     _require(mono <= now, "FUTURE_ORIGINAL_RECEIPT")
                 # Validate operation roles even for repeat presentations.
@@ -276,8 +279,8 @@ class TemporalReview:
                 if known is not None:
                     # A metadata-first view may gain a checked key internally,
                     # but does not publish a new report or refresh the prior view.
-                    if key is not None:
-                        self._keys[key] = (obs, mono)
+                    if key is not None and key not in self._keys:
+                        self._keys[key] = (obs, mono, False)
                     return ReviewResult("DUPLICATE", "INERT_REPRESENTATION")
                 _require(len(self._seen) < self._max_records, "REVIEW_BACKPRESSURE")
                 age = now - mono if aligned else None
@@ -328,7 +331,7 @@ class TemporalReview:
                 encoded = canonical_json(record)
                 self._seen[obs] = fingerprint
                 if key is not None:
-                    self._keys[key] = (obs, mono)
+                    self._keys[key] = (obs, mono, aligned)
                 return ReviewResult("ASSESSED", "STORED_EVIDENCE_ONLY", encoded)
             except TemporalError as exc:
                 return ReviewResult("REJECTED", str(exc))
