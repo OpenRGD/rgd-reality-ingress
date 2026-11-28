@@ -67,7 +67,7 @@ class RehearsalTests(unittest.TestCase):
         self.assertEqual(result.created,len(rows))
 
     def grant(self,obs=None,**kw):
-        opts=dict(payload=True,ttl_seconds=30,max_reads=3);opts.update(kw)
+        opts=dict(payload=True,ttl_seconds=30,max_reads=6);opts.update(kw)
         return self.reader.grant(self.owner,self.obs if obs is None else obs,
                                  purpose="diagnostics",**opts)
     def gate(self,ch,obs=None,**kw):
@@ -167,6 +167,33 @@ class RehearsalTests(unittest.TestCase):
         self.assertEqual(self.review.stats(self.owner)["records"],0)
         self.assertEqual(self.gate(ch).status,"REVIEWED")
 
+    def test_expiry_during_checkpoint_inspection_blocks_second_read(self):
+        ch=self.grant(ttl_seconds=1)
+        actual=pilot_review.verify_selected
+        def slow(*args,**kwargs):
+            proof=actual(*args,**kwargs)
+            self.now+=1_000_000_000
+            return proof
+        with patch.object(pilot_review,"verify_selected",side_effect=slow):
+            self.assertEqual(self.gate(ch).stage,"A04_RECHECK")
+        self.assertEqual(self.review.stats(self.owner)["records"],0)
+
+    def test_revocation_during_checkpoint_inspection_blocks_second_read(self):
+        ch=self.grant()
+        actual=pilot_review.verify_selected
+        def revoke_after(*args,**kwargs):
+            proof=actual(*args,**kwargs)
+            self.reader.revoke(self.owner,ch)
+            return proof
+        with patch.object(pilot_review,"verify_selected",side_effect=revoke_after):
+            self.assertEqual(self.gate(ch).stage,"A04_RECHECK")
+        self.assertEqual(self.review.stats(self.owner)["records"],0)
+
+    def test_second_read_budget_is_required(self):
+        ch=self.grant(max_reads=1)
+        self.assertEqual(self.gate(ch).stage,"A04_RECHECK")
+        self.assertEqual(self.review.stats(self.owner)["records"],0)
+
     def test_generalized_imu_profile_separate_synthetic_rehearsal(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);folder=root/"spool";folder.mkdir(mode=0o700)
@@ -187,7 +214,7 @@ class RehearsalTests(unittest.TestCase):
             reader.register_evidence(owner,canonical_json(verified_ref_from_store(store,obs)),
                  purposes=frozenset({"diagnostics"}),retention_seconds=60,
                  metadata_consent=True,payload_consent=True)
-            ch=reader.grant(owner,obs,purpose="diagnostics",payload=True,ttl_seconds=30)
+            ch=reader.grant(owner,obs,purpose="diagnostics",payload=True,ttl_seconds=30,max_reads=2)
             review=TemporalReview(owner=owner,
                 clock=HostClock("synthetic-host","synthetic-domain","synthetic-boot"))
             r=pilot_review.review_record(reader,review,owner,ch,obs,

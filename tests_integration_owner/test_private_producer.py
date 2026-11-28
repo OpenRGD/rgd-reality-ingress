@@ -95,7 +95,7 @@ class PrivateOwnerRehearsal(unittest.TestCase):
                 reader.register_evidence(owner,canonical_json(verified_ref_from_store(store,item)),
                     purposes=frozenset({"diagnostics"}),retention_seconds=60,
                     metadata_consent=True,payload_consent=True)
-                ch=reader.grant(owner,item,purpose="diagnostics",payload=True,ttl_seconds=30,max_reads=2)
+                ch=reader.grant(owner,item,purpose="diagnostics",payload=True,ttl_seconds=30,max_reads=4)
                 result=review_record(reader,temporal,owner,ch,item,
                                      expected_checkpoint_sha256=proof.checkpoint.sha256)
                 self.assertEqual(result.status,"REVIEWED")

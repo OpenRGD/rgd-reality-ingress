@@ -30,7 +30,8 @@ def review_record(reader, temporal, owner, channel, observation_id, *,
 
     The checkpoint must already be approved and independently retained by the
     owner. A04's authorized read returns bytes only inside this trusted process.
-    A05 compares the selected snapshot and A06 is invoked only on success.
+    A05 compares the selected snapshot, then A04 must authorize the same
+    exact bytes again before A06. Two reads are charged for a success.
     No new grant is minted. This is not an atomic cross-component transaction.
     """
     if type(reader) is not LocalEvidenceReader or type(temporal) is not TemporalReview:
@@ -71,9 +72,19 @@ def review_record(reader, temporal, owner, channel, observation_id, *,
     except (ValueError, TypeError, KeyError, OSError, RuntimeError, AttributeError):
         return GateResult("BLOCKED", "A05", "LOCAL_CHECK_REJECTED")
 
+    # Reauthorize after potentially slow inspection. A04 owns expiry,
+    # revocation and budgets; do not copy or bypass its gate. Both returned
+    # views stay in the trusted host process. Exact comparison is mandatory.
+    current = reader.read(channel, observation_id, purpose="diagnostics", include_payload=True)
+    if (current.status, current.availability) != ("PAYLOAD_RESOLVED", "AVAILABLE"):
+        return GateResult("BLOCKED", "A04_RECHECK", current.availability)
+    if (current.reference_json != view.reference_json or
+            current.payload_bytes != view.payload_bytes or
+            current.integrity_scope != view.integrity_scope):
+        return GateResult("BLOCKED", "A04_RECHECK", "VIEW_CHANGED")
     # No host-clock claim is supplied by this first pilot: archived receipt
     # freshness remains UNKNOWN. No downstream consumer/History event.
-    result = temporal.assess(owner, view, presentation=presentation)
+    result = temporal.assess(owner, current, presentation=presentation)
     if result.status == "DUPLICATE":
         return GateResult("DUPLICATE", "A06", result.reason)
     if result.status != "ASSESSED":

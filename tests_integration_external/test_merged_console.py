@@ -43,7 +43,7 @@ class MergedConsoleRehearsal(unittest.TestCase):
             reader.register_evidence(owner,canonical_json(verified_ref_from_store(store,obs)),
                  purposes=frozenset({"diagnostics"}),retention_seconds=60,
                  metadata_consent=True,payload_consent=True)
-            ch=reader.grant(owner,obs,purpose="diagnostics",payload=True,ttl_seconds=30,max_reads=2)
+            ch=reader.grant(owner,obs,purpose="diagnostics",payload=True,ttl_seconds=30,max_reads=3)
             view=reader.read(ch,obs,purpose="diagnostics",include_payload=True)
             self.assertEqual(view.status,"PAYLOAD_RESOLVED")
             self.assertEqual(view.payload_bytes,raw)
