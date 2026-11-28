@@ -1,0 +1,95 @@
+name: RI-INTEGRATION-02 pilot readiness
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  stack-rehearsal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m pip install -e . "jsonschema==4.23.0"
+      - name: Frozen parent stack and registry
+        run: |
+          python scripts/check_integration_stack.py
+          python scripts/check_compat_registry.py --git-baseline
+      - name: Integrated pilot gates and faults
+        run: |
+          python -m unittest discover -s tests_integration -v
+          python -O -m unittest discover -s tests_integration -v
+  merged-console:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      RI_CHECKOUT: ${{ github.workspace }}
+      CONSOLE_OWNER_CHECKOUT: ${{ github.workspace }}/.upstream/console
+      PYTHONPATH: ${{ github.workspace }}/src
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OpenRGD/rgd-console
+          ref: b331dd32415eeda0d107676920a6dea91170cc4f
+          path: .upstream/console
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Pin merged helper and frozen schema
+        run: |
+          test "$(git -C "$CONSOLE_OWNER_CHECKOUT" rev-parse HEAD)" = b331dd32415eeda0d107676920a6dea91170cc4f
+          test "$(git hash-object "$CONSOLE_OWNER_CHECKOUT/scripts/ri_periph_compat.py")" = 34710eba7cecf0235cd2651edd286f5ac79a41fe
+          test "$(git hash-object "$CONSOLE_OWNER_CHECKOUT/scripts/tests/test_ri_periph_compat.py")" = bc612ab85a2c409b5866cda6847d7639ce88af99
+          test "$(git hash-object "$CONSOLE_OWNER_CHECKOUT/contracts/console/v1/imu-observation.v0.1.schema.json")" = 8ddbe8d7639e35f0a9442a80e27c9e49f882eb7c
+          python -m pip install "jsonschema==4.23.0"
+      - name: Original merged consumer tests and complete synthetic stack
+        run: |
+          python -m unittest discover -s "$CONSOLE_OWNER_CHECKOUT/scripts/tests" -p 'test_ri_periph_compat.py' -v
+          python -m unittest discover -s tests_integration_external -v
+  merged-cal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CAL_CHECKOUT: ${{ github.workspace }}/.upstream/cal
+      CAL_PROBE: ${{ github.workspace }}/.upstream/cal/target/debug/examples/contract_exchange
+      PYTHONPATH: ${{ github.workspace }}/src
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: OpenRGD/rgd-calibration
+          ref: 8268a621dc2b14a22473830f19d448f32236d9b1
+          path: .upstream/cal
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Verify merged CAL pin and exact previously reviewed blobs
+        run: |
+          test "$(git -C "$CAL_CHECKOUT" rev-parse HEAD)" = 8268a621dc2b14a22473830f19d448f32236d9b1
+          test "$(git hash-object "$CAL_CHECKOUT/src/ri_association.rs")" = 815c20efc4acf60d943d7214455b85f871209bb3
+          test "$(git hash-object "$CAL_CHECKOUT/contracts/ri-calibration-association.v0.1-candidate.schema.json")" = 6c26a4d3618721326326a0cb2966a5137f6d87fe
+          test "$(git hash-object "$CAL_CHECKOUT/examples/contract_exchange.rs")" = e5cda48ef14b99c025a638a6875ef2e3cfed2aa5
+          python -m pip install "jsonschema==4.23.0"
+      - name: Rebuild actual merged CAL probe and rerun native profile exchange
+        run: |
+          cargo build --locked --manifest-path "$CAL_CHECKOUT/Cargo.toml" --features ri-candidate --example contract_exchange
+          python -m unittest discover -s tests_cal_external -v
