@@ -1,0 +1,245 @@
+{
+  "schema_version": "ri.integration-stack-review.v0.1-candidate",
+  "review_date": "2026-11-28",
+  "normative": false,
+  "physical_commissioning": false,
+  "deployment_authorized": false,
+  "baseline_registry": "docs/compatibility/registry.v0.1.json",
+  "cal_supplement": "docs/compatibility/registry.snapshot-2026-11-26-cal-021-c.json",
+  "frozen_consumer_schema_blob": "3d92e074e71593bf6db0a735394c628ea131668d",
+  "reviewed_stack_head": "60c41b333527dfed6205d4bf0bae4926a6e3bae3",
+  "stack": [
+    {
+      "pr": 4,
+      "task": "RI-INTEGRATION-01",
+      "base": "c5b65948414bdd650d4e5ac36b3a59106664a00e",
+      "head": "5372f758df79c93fc887f3858d878635447f4a4d",
+      "state_at_review": "open_draft"
+    },
+    {
+      "pr": 7,
+      "task": "RI-A01",
+      "base": "5372f758df79c93fc887f3858d878635447f4a4d",
+      "head": "37e9ccc42cd6d26985116cb7d6682e9931041084",
+      "state_at_review": "open_draft"
+    },
+    {
+      "pr": 8,
+      "task": "RI-A02",
+      "base": "37e9ccc42cd6d26985116cb7d6682e9931041084",
+      "head": "161318d2897d07d5628ef502cafba1c7c489fff0",
+      "state_at_review": "open_draft"
+    },
+    {
+      "pr": 9,
+      "task": "RI-A02B",
+      "base": "161318d2897d07d5628ef502cafba1c7c489fff0",
+      "head": "563d923cd65805a2fc40b431635241871720932f",
+      "state_at_review": "open_draft"
+    },
+    {
+      "pr": 10,
+      "task": "RI-A03",
+      "base": "563d923cd65805a2fc40b431635241871720932f",
+      "head": "3a2b827ab9a07d8b0d6670dff6840d3234895e13",
+      "state_at_review": "open_draft"
+    },
+    {
+      "pr": 11,
+      "task": "RI-A04",
+      "base": "3a2b827ab9a07d8b0d6670dff6840d3234895e13",
+      "head": "3b9a9c2e6d7f69aae3dde1e690fc3c90562a1f43",
+      "state_at_review": "open_draft"
+    },
+    {
+      "pr": 12,
+      "task": "RI-A05",
+      "base": "3b9a9c2e6d7f69aae3dde1e690fc3c90562a1f43",
+      "head": "1dda4356cc082d5c595a3da68b154426089264f2",
+      "state_at_review": "open_draft"
+    },
+    {
+      "pr": 13,
+      "task": "RI-A06",
+      "base": "1dda4356cc082d5c595a3da68b154426089264f2",
+      "head": "60c41b333527dfed6205d4bf0bae4926a6e3bae3",
+      "state_at_review": "open_draft"
+    }
+  ],
+  "reviewed_stack_ci": [
+    {
+      "run_id": 46036956509,
+      "head": "60c41b333527dfed6205d4bf0bae4926a6e3bae3",
+      "conclusion": "success"
+    },
+    {
+      "run_id": 46036956428,
+      "head": "60c41b333527dfed6205d4bf0bae4926a6e3bae3",
+      "conclusion": "success"
+    },
+    {
+      "run_id": 46036956577,
+      "head": "60c41b333527dfed6205d4bf0bae4926a6e3bae3",
+      "conclusion": "success"
+    },
+    {
+      "run_id": 46036956642,
+      "head": "60c41b333527dfed6205d4bf0bae4926a6e3bae3",
+      "conclusion": "success"
+    },
+    {
+      "run_id": 46036956444,
+      "head": "60c41b333527dfed6205d4bf0bae4926a6e3bae3",
+      "conclusion": "success"
+    },
+    {
+      "run_id": 46036956453,
+      "head": "60c41b333527dfed6205d4bf0bae4926a6e3bae3",
+      "conclusion": "success"
+    },
+    {
+      "run_id": 46036956446,
+      "head": "60c41b333527dfed6205d4bf0bae4926a6e3bae3",
+      "conclusion": "success"
+    },
+    {
+      "run_id": 46036956399,
+      "head": "60c41b333527dfed6205d4bf0bae4926a6e3bae3",
+      "conclusion": "success"
+    }
+  ],
+  "owner_merges": [
+    {
+      "repository": "italiarobotica/paky-01",
+      "pr": 8,
+      "head": "2e673242337f483db62970a910d942f53628d914",
+      "merge": "ca5fd652d43cdf5298ddf50470c98e0724ac5b5f",
+      "ci": [
+        {
+          "run_id": 45806094657,
+          "head": "ca5fd652d43cdf5298ddf50470c98e0724ac5b5f",
+          "conclusion": "success"
+        }
+      ],
+      "scope": "Static audit at merge; original exporter/test blobs unchanged; private producer rerun with A03-A06 pending; first physical baseline.",
+      "installation_verified": false
+    },
+    {
+      "repository": "OpenRGD/rgd-imu",
+      "pr": 4,
+      "head": "c0e467f6329c1289661111c4e326f63838586723",
+      "merge": "b8fd0b714098780792c9e16aa1b00ac3d583b037",
+      "ci": [
+        {
+          "run_id": 45795191320,
+          "head": "b8fd0b714098780792c9e16aa1b00ac3d583b037",
+          "conclusion": "success"
+        },
+        {
+          "run_id": 45795191230,
+          "head": "b8fd0b714098780792c9e16aa1b00ac3d583b037",
+          "conclusion": "success"
+        },
+        {
+          "run_id": 45795191237,
+          "head": "b8fd0b714098780792c9e16aa1b00ac3d583b037",
+          "conclusion": "success"
+        }
+      ],
+      "scope": "Owner RI CI pinned to historical RI #4; exporter/test blobs unchanged; private integrated rerun and later instance migration pending.",
+      "installation_verified": false
+    },
+    {
+      "repository": "OpenRGD/rgd-console",
+      "pr": 22,
+      "head": "610f02fe277fac89fdf2912a671cd3a13cb488ff",
+      "merge": "b331dd32415eeda0d107676920a6dea91170cc4f",
+      "ci": [
+        {
+          "run_id": 45983897534,
+          "head": "b331dd32415eeda0d107676920a6dea91170cc4f",
+          "conclusion": "success"
+        },
+        {
+          "run_id": 45983897526,
+          "head": "b331dd32415eeda0d107676920a6dea91170cc4f",
+          "conclusion": "success"
+        }
+      ],
+      "scope": "Merged helper/test identical to historical checked #22 pin; post-merge Foundation and PERIPH CI, not a post-merge RI-specific run. Integrated CI will exercise actual merged helper.",
+      "installation_verified": false
+    },
+    {
+      "repository": "OpenRGD/rgd-periph",
+      "pr": 1,
+      "head": "1e4c50476f26e4840efab2b12374e8fbb7f991f6",
+      "merge": "a36c2d7c42b0bb3f4b2e4c78b42b999be0fac6cd",
+      "ci": [
+        {
+          "run_id": 46109733082,
+          "head": "a36c2d7c42b0bb3f4b2e4c78b42b999be0fac6cd",
+          "conclusion": "success"
+        }
+      ],
+      "scope": "Standalone extraction CI, not source acquisition commissioning; no new runtime dependency or cutover.",
+      "installation_verified": false
+    },
+    {
+      "repository": "OpenRGD/rgd-calibration",
+      "pr": 9,
+      "head": "646dbc05bcefd15942b25bb55b3c99096f0cccc9",
+      "merge": "8268a621dc2b14a22473830f19d448f32236d9b1",
+      "ci": [
+        {
+          "run_id": 46032615854,
+          "head": "8268a621dc2b14a22473830f19d448f32236d9b1",
+          "conclusion": "success"
+        },
+        {
+          "run_id": 46032615902,
+          "head": "8268a621dc2b14a22473830f19d448f32236d9b1",
+          "conclusion": "success"
+        },
+        {
+          "run_id": 46032615788,
+          "head": "8268a621dc2b14a22473830f19d448f32236d9b1",
+          "conclusion": "success"
+        },
+        {
+          "run_id": 46032615760,
+          "head": "8268a621dc2b14a22473830f19d448f32236d9b1",
+          "conclusion": "success"
+        },
+        {
+          "run_id": 46032559425,
+          "head": "8268a621dc2b14a22473830f19d448f32236d9b1",
+          "conclusion": "success"
+        },
+        {
+          "run_id": 46032559495,
+          "head": "8268a621dc2b14a22473830f19d448f32236d9b1",
+          "conclusion": "success"
+        },
+        {
+          "run_id": 46032559342,
+          "head": "8268a621dc2b14a22473830f19d448f32236d9b1",
+          "conclusion": "success"
+        },
+        {
+          "run_id": 46032559458,
+          "head": "8268a621dc2b14a22473830f19d448f32236d9b1",
+          "conclusion": "success"
+        }
+      ],
+      "scope": "Merged CAL native exchange source and sidecar/schema/exporter blobs unchanged; post-merge owner CI; integrated CI reruns actual merged Rust probe, not physical metrology.",
+      "installation_verified": false
+    }
+  ],
+  "unresolved_returns": [
+    "RI-H01",
+    "RI-H07",
+    "RI-H09"
+  ],
+  "physical_gate": "NOT_AUTHORIZED",
+  "private_producer_replay": "NOT_RUN_BY_PUBLIC_CI"
+}
